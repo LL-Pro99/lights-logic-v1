@@ -1,1 +1,45 @@
 
+
+name: Build Lights Logic Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get app source
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android project files
+        run: flutter create --platforms=android --org com.lightslogic .
+
+      - name: Get app packages
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Save APK for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lights-Logic-V1-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
